@@ -3,7 +3,7 @@ locals {
   process_domain_validation_options = local.enabled && var.process_domain_validation_options && var.validation_method == "DNS"
   domain_validation_options_set     = local.process_domain_validation_options ? aws_acm_certificate.default.0.domain_validation_options : toset([])
   public_enabled                    = var.certificate_authority_arn == null
-  private_enabled                   = ! local.public_enabled
+  private_enabled                   = !local.public_enabled
 
   all_domains = concat(
     [var.domain_name],
@@ -11,7 +11,7 @@ locals {
   )
   domain_to_zone = {
     for domain in local.all_domains :
-    domain => join(".", slice(split(".", domain), 1, length(split(".", domain))))
+    domain => length(split(".", domain)) > 2 ? join(".", slice(split(".", domain), 1, length(split(".", domain)))) : domain
   }
   unique_zones = distinct(values(local.domain_to_zone))
 }
